@@ -27,8 +27,8 @@ get_egs_stage=-10
 chunk_width=150,110,100
 
 # training options
-num_jobs_initial=2
-num_jobs_final=12
+num_jobs_initial=1
+num_jobs_final=1
 num_epochs=6
 minibatch_size=128
 initial_effective_lrate=0.001

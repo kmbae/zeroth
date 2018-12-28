@@ -43,7 +43,7 @@ for part in train_data_01 test_data_01; do
 	local/updateSegmentation.sh data/$part data/local/lm
 done
 
-# prepare dictionary and language model 
+# prepare dictionary and language model
 local/prepare_dict.sh data/local/lm data/local/dict_nosp
 
 utils/prepare_lang.sh data/local/dict_nosp \
@@ -95,7 +95,7 @@ steps/align_si.sh --boost-silence 1.25 --nj $nCPU --cmd "$train_cmd" \
 echo "#### Triphone Training, delta + delta-delta ###########"
 # train a first delta + delta-delta triphone system on a subset of 5000 utterancesa
 # number of maximum pdf, gaussian (under/over fitting)
-#  recognition result 
+#  recognition result
 steps/train_deltas.sh --boost-silence 1.25 --cmd "$train_cmd" \
     2000 10000 data/train_5k data/lang_nosp exp/mono_ali_5k exp/tri1
 steps/align_si.sh --nj $nCPU --cmd "$train_cmd" \
@@ -175,14 +175,14 @@ steps/align_fmllr.sh --nj $nCPU --cmd "$train_cmd" \
 
 finishTime=$(date +'%F-%H-%M')
 echo "GMM trainig is finished at" $finishTime
-exit
+#exit
 ## online chain recipe using only clean data set
 echo "#### online chain training  ###########"
 ## check point: sudo nvidia-smi --compute-mode=3 if you have multiple GPU's
 #local/chain/run_tdnn_1a.sh
 #local/chain/run_tdnn_1b.sh
 #local/chain/multi_condition/run_tdnn_lstm_1e.sh --nj $nCPU
-local/chain/multi_condition/run_tdnn_1n.sh --nj $nCPU 
+local/chain/multi_condition/run_tdnn_1n.sh --nj $nCPU
 #local/chain/run_tdnn_opgru_1c.sh --nj $nCPU
 
 

@@ -6,10 +6,11 @@ set -e -o pipefail
 # (some of which are also used in this script directly).
 stage=0
 nj=30
-train_set=train_clean
+train_set="train_data_01"
+#train_clean
 num_data_reps=1        # number of reverberated copies of data to generate
-speed_perturb=true
-test_sets="test_200"
+speed_perturb=false
+test_sets="test_data_01"
 gmm=tri4b        # this is the source gmm-dir that we'll use for alignments; it
                  # should have alignments for the specified training data.
 nnet3_affix=_rvb       # affix for exp dirs, e.g. it was _cleaned in tedlium.
@@ -28,8 +29,8 @@ get_egs_stage=-10
 chunk_width=150,110,100
 
 # training options
-num_jobs_initial=2
-num_jobs_final=7
+num_jobs_initial=1
+num_jobs_final=1
 num_epochs=4
 minibatch_size=128
 initial_effective_lrate=0.0015
@@ -82,7 +83,7 @@ tree_dir=exp/chain_rvb/tree_a
 # you should probably name it differently.
 lang=data/lang_chain
 
-if [ -d exp/${gmm}_ali_${train_set} ]; then 
+if [ -d exp/${gmm}_ali_${train_set} ]; then
     ali_dir=exp/${gmm}_ali_${train_set}
 else
     echo "$0: Using Alignment from GMM dir at ${gmm}..."
@@ -119,7 +120,7 @@ if [ $stage -le 8 ]; then
     steps/nnet3/chain/gen_topo.py $nonsilphonelist $silphonelist >$lang/topo
   fi
 fi
-
+echo ""Step 8 end""
 if [ $stage -le 9 ]; then
   # Get the alignments as lattices (gives the chain training more freedom).
   # use the same num-jobs as the alignments
@@ -147,7 +148,7 @@ if [ $stage -le 9 ]; then
       split_scps="$split_scps $lat_dir/temp/combined_lats_sorted.$n.scp"
   done
   utils/split_scp.pl $lat_dir/temp/combined_lats_sorted.scp $split_scps
-  
+
   $train_cmd JOB=1:$num_jobs $lat_dir/temp/split_scp_copy.JOB.log \
       lattice-copy scp:$lat_dir/temp/combined_lats_sorted.JOB.scp "ark:|gzip -c >$lat_dir/lat.JOB.gz" \
       || exit 1;
@@ -164,7 +165,7 @@ if [ $stage -le 9 ]; then
 fi
 
 if [ $stage -le 10 ]; then
-  # Build a tree using our new topology.  
+  # Build a tree using our new topology.
    if [ -f $tree_dir/final.mdl ]; then
      echo "$0: $tree_dir/final.mdl already exists, refusing to overwrite it."
      exit 1;
