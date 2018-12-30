@@ -48,7 +48,7 @@ echo "$0 $@"  # Print the command line for logging
 . ./cmd.sh
 . ./path.sh
 . ./utils/parse_options.sh
-
+echo "Preparation comnplete"
 local/nnet3/multi_condition/run_ivector_common.sh --stage $stage  \
                                  --speed-perturb ${speed_perturb} \
                                  --num-data-reps ${num_data_reps} \
@@ -89,14 +89,14 @@ else
     echo "$0: Using Alignment from GMM dir at ${gmm}..."
     ali_dir=${gmm_dir}
 fi
-
+echo "Done 1"
 
 for f in $train_data_dir/feats.scp $train_ivector_dir/ivector_online.scp \
     $lores_train_data_dir/feats.scp $gmm_dir/final.mdl \
     $ali_dir/ali.1.gz $gmm_dir/final.mdl; do
   [ ! -f $f ] && echo "$0: expected file $f to exist" && exit 1
 done
-
+echo "Done 2"
 
 if [ $stage -le 8 ]; then
   echo "$0: creating lang directory $lang with chain-type topology"

@@ -18,7 +18,7 @@
 # 4. parameters: nCPU, num_jobs_initial, num_jobs_final, --max-noises-per-minute
 
 data=./speechDATA
-nCPU=16
+nCPU=30
 
 . ./cmd.sh
 . ./path.sh

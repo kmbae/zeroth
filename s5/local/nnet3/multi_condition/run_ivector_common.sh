@@ -7,11 +7,11 @@
 stage=0
 gmmdir=exp/tri4b
 speed_perturb=false
-trainset=train_clean
+trainset=train_data_01
 num_data_reps=1
 rvb_affix=_rvb
-nj=20
-maxThread=30  # the max number of schedullable thread on your machine 
+nj=30
+maxThread=30  # the max number of schedullable thread on your machine
 
 set -e
 . cmd.sh
@@ -23,7 +23,7 @@ if [ "$speed_perturb" == "true" ]; then
   if [ $stage -le 1 ]; then
     #Although the nnet will be trained by high resolution data, we still have to perturbe the normal data to get the alignment
     # _sp stands for speed-perturbed
-
+    echo "Speed_turb in"
     for datadir in ${trainset} ; do
       utils/perturb_data_dir_speed.sh 0.9 data/${datadir} data/temp1
       utils/perturb_data_dir_speed.sh 1.1 data/${datadir} data/temp2
@@ -51,7 +51,7 @@ if [ "$speed_perturb" == "true" ]; then
   fi
 
   if [ $stage -le 2 ]; then
-    #obtain the alignment of the perturbed data
+    echo "obtain the alignment of the perturbed data"
     steps/align_fmllr.sh --nj $nj --cmd "$train_cmd" \
       data/${trainset}_sp data/lang_nosp ${gmmdir} ${gmmdir}_ali_${trainset}_sp || exit 1
   fi
@@ -89,7 +89,7 @@ if [ $stage -le 3 ]; then
   ### applied GridEngine for speed-up
   logdir=data/${trainset}/log
   mkdir -p $logdir
-  nj=20
+  nj=30
 
   utils/split_data.sh data/$trainset $nj
 
@@ -127,21 +127,22 @@ if [ $stage -le 3 ]; then
   # this will helpfull to reduce time consuming get_egs.sh in nnet3 training
   from=data/${trainset}
   to=data/${trainset}_rvb${num_data_reps}_hires
-  
+
   for i in `seq 1 $nj`; do
 	  cat data/${trainset}/split$nj/$i/reco2dur
-  done | sort -k1 > $from/reco2dur  
-  
+  done | sort -k1 > $from/reco2dur
+
   if [ -f $to/utt2dur ] ; then
     rm $to/uttdur
   fi
   for i in `seq 0 ${num_data_reps}`; do
-    cat $from/reco2dur | sed -e "s/^/rev${i}_/" >> $to/utt2dur  
+    cat $from/reco2dur | sed -e "s/^/rev${i}_/" >> $to/utt2dur
   done
   ###
 
 
   for datadir in ${trainset}_rvb${num_data_reps} ; do
+      echo "in second compute_cmvn"
     steps/make_mfcc.sh --nj $nj --mfcc-config conf/mfcc_hires.conf \
       --cmd "$train_cmd" data/${datadir}_hires exp/make_hires/$datadir $mfccdir || exit 1;
     steps/compute_cmvn_stats.sh data/${datadir}_hires exp/make_hires/$datadir $mfccdir || exit 1;
@@ -205,7 +206,7 @@ if [ $stage -le 7 ]; then
   # handle per-utterance decoding well (iVector starts at zero).
   utils/data/modify_speaker_info.sh --utts-per-spk-max 2 \
     data/${trainset}_rvb${num_data_reps}_hires data/${trainset}_rvb${num_data_reps}_hires_max2
-  
+
   steps/online/nnet2/extract_ivectors_online.sh --cmd "$train_cmd" --nj $nj \
     data/${trainset}_rvb${num_data_reps}_hires_max2 exp/nnet3${rvb_affix}/extractor $ivectordir || exit 1;
 fi
