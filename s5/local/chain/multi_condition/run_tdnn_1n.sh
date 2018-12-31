@@ -6,11 +6,11 @@ set -e -o pipefail
 # (some of which are also used in this script directly).
 stage=0
 nj=30
-train_set="train_data_01"
+train_set="train_clean"
 #train_clean
 num_data_reps=1        # number of reverberated copies of data to generate
-speed_perturb=false
-test_sets="test_data_01"
+speed_perturb=true
+test_sets="test_clean"
 gmm=tri4b        # this is the source gmm-dir that we'll use for alignments; it
                  # should have alignments for the specified training data.
 nnet3_affix=_rvb       # affix for exp dirs, e.g. it was _cleaned in tedlium.
