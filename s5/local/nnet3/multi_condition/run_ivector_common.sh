@@ -7,7 +7,7 @@
 stage=0
 gmmdir=exp/tri4b
 speed_perturb=false
-trainset=train_data_01
+trainset=train_clean
 num_data_reps=1
 rvb_affix=_rvb
 nj=30
